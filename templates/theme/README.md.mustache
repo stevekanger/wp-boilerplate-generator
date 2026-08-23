@@ -8,12 +8,11 @@ Modern WordPress theme featuring Composer autoloading, Docker support, and Webpa
 
 ## Folder structure
 
-All php files reside in `inc`. All `psr-4` classes will be autoloaded via `composer` from the `app` folder.
+All php files reside in `inc`. All `psr-4` classes will be autoloaded via `composer` from the `inc/app` folder.
 
 All raw js, css, and blocks reside in `src`. These are files that need to be built during the build process.
 
 ## Installation
-
 
 ```bash
 npm install
@@ -23,6 +22,7 @@ composer install
 composer dump-autoload
 
 ```
+
 ## Usage
 
 ### Docker
@@ -49,14 +49,14 @@ npm run dev
 
 ```
 
-To archive your plugin for distribution run.
+To archive for distribution run.
 
 ```bash
 npm run archive:plugin
 
 ```
 
-To archive your entire development version of the plugin. This can be handy if your developing for a client and need to ship the entire plugin contents.
+To archive the entire development package.
 
 ```bash
 npm run archive:dev
@@ -88,3 +88,7 @@ The wordpress testing suits are installed from `https://develop.svn.wordpress.or
 The choice is up to you how you want to keep your plugin current. In `.env` you can specify your php and wordpress versions.
 
 For every wordpress release in the future you will need to update the `composer.json` wordpress testing suite manually. So if you change versions in your `.env` file for docker you would want to update `composer.json` to match your wordpress version. Then run `composer update`.
+
+## License
+
+This software is licensed under the GNU General Public License v2.0 or later. See `license.txt` for more information.
