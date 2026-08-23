@@ -55,7 +55,7 @@ Docker env variables for php and wordpress versions will be set in `.env`. The w
 
 ### Tests
 
-You have the choice whether or not to install tests. Js testing is done with `vitest` and php testig is done with `phpunit` and the wordpress phpunit test suite.
+You have the choice whether or not to install tests. Js testing is done with `vitest` and php testing is done with `phpunit` and the wordpress phpunit test suite.
 
 for js run
 
