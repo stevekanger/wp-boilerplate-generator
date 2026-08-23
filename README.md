@@ -73,4 +73,4 @@ The wordpress testing suits are installed from `https://develop.svn.wordpress.or
 
 ## License
 
-This software is licensed under the GPLG license. See [LICENSE](https://github.com/stevekanger/wp-boilerplate-generator/blob/main/LICENSE) for more information.
+This software is licensed under the GNU General Public License v2.0 or later. See [LICENSE](https://github.com/stevekanger/wp-boilerplate-generator/blob/main/LICENSE) for more information.
