@@ -1,0 +1,20 @@
+{
+  "name": "wp-boilerplate-generator",
+  "version": "0.1.0",
+  "description": "",
+  "license": "MIT",
+  "author": "stevekanger",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsx ./src/index.ts"
+  },
+  "devDependencies": {
+    "@types/mustache": "^4.2.6",
+    "@types/node": "^26.2.0",
+    "mustache": "^4.2.0",
+    "tsx": "^4.23.12",
+    "typescript": "^7.0.2"
+  }
+}

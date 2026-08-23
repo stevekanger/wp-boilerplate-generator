@@ -1,0 +1,78 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{phpNamespace}}\Controllers;
+
+use {{phpNamespace}}\Core\Controller;
+use {{phpNamespace}}\Core\PluginConfig;
+
+defined('ABSPATH') || exit;
+
+/**
+ * AssetController class.
+ *
+ * This is the controller responsible for handling assets.
+ * Enqueuing scripts, etc.
+ *
+ * @since 0.1.0
+ */
+final class AssetController extends Controller {
+    /**
+     * Registers the hooks and filters.
+     *
+     * @since 0.1.0
+     */
+    public function register(): void {
+        add_action('wp_enqueue_scripts', [$this, 'enqueue_client_assets']);
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_assets']);
+    }
+
+    /**
+     * Enqueue the client side scripts.
+     *
+     * @since 0.1.0
+     */
+    public function enqueue_client_assets(): void {
+        // enqueue js
+        wp_enqueue_script(
+            PluginConfig::prefix('client'),
+            PluginConfig::root_dir_url('/build/client/index.js'),
+            [],
+            PluginConfig::version(),
+            [],
+        );
+
+        // enqueue css
+        wp_enqueue_style(
+            PluginConfig::prefix('client'),
+            PluginConfig::root_dir_url('/build/client/index.css'),
+            [],
+        );
+    }
+
+    /**
+     * Enqueue the admin side scripts.
+     *
+     * @return void
+     *
+     * @since 0.1.0
+     */
+    public function enqueue_admin_assets() {
+        // enqueue js
+        wp_enqueue_script(
+            PluginConfig::prefix('admin'),
+            PluginConfig::root_dir_url('/build/admin/index.js'),
+            [],
+            PluginConfig::version(),
+            [],
+        );
+
+        // enqueue css
+        wp_enqueue_style(
+            PluginConfig::prefix('admin'),
+            PluginConfig::root_dir_url('/build/admin/index.css'),
+            [],
+        );
+    }
+}

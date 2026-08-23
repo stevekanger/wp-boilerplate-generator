@@ -1,0 +1,111 @@
+# {{title}}
+{{#description}}
+
+{{.}}
+{{/description}}
+
+Modern WordPress plugin featuring an MVC structure, dependency injection container, Composer autoloading, Docker support, and Webpack build pipeline.
+
+## Folder structure
+
+All php files reside in `inc`. All `psr-4` classes will be autoloaded via `composer` from the `app` folder.
+
+All raw js, css, and blocks reside in `src`. These are files that need to be built during the build process.
+
+## Installation
+
+Clone or download this repository.
+
+```bash
+npm install
+
+composer install
+
+composer dump-autoload
+
+```
+
+## Usage
+
+### Docker
+
+Docker set up to control the development environment. You must have `docker` and `docker-compose` installed.
+
+Docker env variables for php and wordpress versions will be set in `.env`. The wordpress `debug.log` file from the docker container will be placed in the projects root directory.
+
+### Dev Scripts
+
+```bash
+npm run build
+
+```
+
+Development run.
+
+```bash
+docker compose up -d
+
+npm run dev
+
+```
+
+To archive your plugin for distribution run.
+
+```bash
+npm run archive:plugin
+
+```
+
+To archive your entire development version of the plugin. This can be handy if your developing for a client and need to ship the entire plugin contents.
+
+```bash
+npm run archive:dev
+
+```
+
+## Blocks
+
+### Create a block
+
+Use the `create:block` npm script supplied. Block information can be controlled in the `config.json` file. Any additional `block.json` defaults may be placed here in the `json` field.
+
+Then just run the command below specifying the block type `dynamic` or `static` and changing `my-block` to your desired block slug:
+
+( Note: the slug should be dash seperated. Eg. `my-block` )
+
+```bash
+npm run create:block dynamic my-block
+
+```
+
+The script will create your block files in `src/blocks`. Block files will use typescript by default. Edit the `block.json` file to your liking. The `create:block` script uses basically the same templates wordpress does `https://github.com/WordPress/gutenberg/tree/trunk/packages/create-block/lib/templates/block`. They have been modified slightly for use with typescript.
+
+### Register a block
+
+Once you have successfully created a block all you have to do is add the block slug to the `register` array in `inc/config/block-config.php`. This array assumes your blocks source files are located in the `src/blocks` folder and built to `build/blocks` folder.
+{{#installTests}}
+
+## Testing
+
+Js testing is done with `vitest` and php testig is done with `phpunit` and the wordpress phpunit test suite.
+
+for js run
+
+```bash
+npm run test
+```
+
+for php run
+
+```bash
+composer test
+```
+
+The wordpress testing suits are installed from `https://develop.svn.wordpress.org/tags`. It will be installed via custom composer repository and use whatever wordpress version you picked when running the init script.
+{{/installTests}}
+
+## Updating php and wordpress versions
+
+The choice is up to you how you want to keep your plugin current. In `.env` you can specify your php and wordpress versions.
+
+For every wordpress release in the future you will need to update the `composer.json` wordpress testing suite manually. So if you change versions in your `.env` file for docker you would want to update `composer.json` to match your wordpress version. Then run `composer update`.

@@ -1,0 +1,90 @@
+# {{title}}
+{{#description}}
+
+{{.}}
+{{/description}}
+
+Modern WordPress theme featuring Composer autoloading, Docker support, and Webpack build pipeline.
+
+## Folder structure
+
+All php files reside in `inc`. All `psr-4` classes will be autoloaded via `composer` from the `app` folder.
+
+All raw js, css, and blocks reside in `src`. These are files that need to be built during the build process.
+
+## Installation
+
+
+```bash
+npm install
+
+composer install
+
+composer dump-autoload
+
+```
+## Usage
+
+### Docker
+
+Docker set up to control the development environment. You must have `docker` and `docker-compose` installed.
+
+Docker env variables for php and wordpress versions will be set in `.env`. The wordpress `debug.log` file from the docker container will be placed in the projects root directory.
+
+### Dev Scripts
+
+Build run.
+
+```bash
+npm run build
+
+```
+
+Development run.
+
+```bash
+docker compose up -d
+
+npm run dev
+
+```
+
+To archive your plugin for distribution run.
+
+```bash
+npm run archive:plugin
+
+```
+
+To archive your entire development version of the plugin. This can be handy if your developing for a client and need to ship the entire plugin contents.
+
+```bash
+npm run archive:dev
+
+```
+{{#installTests}}
+
+## Testing
+
+Js testing is done with `vitest` and php testig is done with `phpunit` and the wordpress phpunit test suite.
+
+for js run
+
+```bash
+npm run test
+```
+
+for php run
+
+```bash
+composer test
+```
+
+The wordpress testing suits are installed from `https://develop.svn.wordpress.org/tags`. It will be installed via custom composer repository and use whatever wordpress version you picked when running the init script.
+{{/installTests}}
+
+## Updating php and wordpress versions
+
+The choice is up to you how you want to keep your plugin current. In `.env` you can specify your php and wordpress versions.
+
+For every wordpress release in the future you will need to update the `composer.json` wordpress testing suite manually. So if you change versions in your `.env` file for docker you would want to update `composer.json` to match your wordpress version. Then run `composer update`.

@@ -1,0 +1,25 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{phpNamespace}}\Traits;
+
+defined('ABSPATH') || exit;
+
+/**
+ * Allows access to the $wpdb instance.
+ *
+ * @since 0.1.0
+ */
+trait WpdbTrait {
+    /**
+     * Gets the $wpdb instance.
+     *
+     * @since 0.1.0
+     */
+    protected function wpdb(): \wpdb {
+        global $wpdb;
+
+        return $wpdb;
+    }
+}

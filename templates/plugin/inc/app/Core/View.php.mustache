@@ -1,0 +1,70 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{phpNamespace}}\Core;
+
+/**
+ * Create a view from template part.
+ *
+ * @since 0.1.0
+ */
+final class View {
+    private string $rendered;
+    private string $view;
+    private mixed $data;
+
+    /**
+     * Construct the view object attributes.
+     *
+     * @param string $view The blade template
+     * @param mixed  $data Any data you want passed to the view (Note: this data will be extracted to variables)
+     *
+     * @since 0.1.0
+     */
+    public function __construct(string $view, array $data = []) {
+        $this->view = $view;
+        $this->data = $data;
+
+        extract($data);
+        ob_start();
+        include PluginConfig::root_dir("/inc/views/{$view}.php");
+        $this->rendered = ob_get_clean();
+    }
+
+    /**
+     * Echo the rendered output.
+     *
+     * @since 0.1.0
+     */
+    public function echo(): void {
+        echo $this->rendered;
+    }
+
+    /**
+     * Get the rendered output.
+     *
+     * @since 0.1.0
+     */
+    public function rendered(): string {
+        return $this->rendered;
+    }
+
+    /**
+     * Get the view name.
+     *
+     * @since 0.1.0
+     */
+    public function get_view(): string {
+        return $this->view;
+    }
+
+    /**
+     * Get the template data.
+     *
+     * @since 0.1.0
+     */
+    public function get_data(): mixed {
+        return $this->data;
+    }
+}

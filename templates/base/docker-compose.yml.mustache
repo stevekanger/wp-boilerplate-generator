@@ -1,0 +1,202 @@
+services:
+  # ============================================================================
+  # Development wordpress container
+  # ============================================================================
+  wordpress:
+    image: ${SLUG}-wordpress${DOCKER_WP_VERSION}-php${DOCKER_PHP_VERSION}-apache
+    container_name: ${SLUG}-wordpress
+    restart: unless-stopped
+
+    build:
+      context: .
+      args:
+        PHP_VERSION: ${DOCKER_PHP_VERSION}
+        WORDPRESS_VERSION: ${DOCKER_WP_VERSION}
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    ports:
+      - '${DOCKER_PORT_WP_DEVELOPMENT}:80'
+
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: ${DOCKER_WP_DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DOCKER_WP_DB_PASSWORD}
+      WORDPRESS_DB_NAME: ${DOCKER_WP_DB_NAME}
+      WORDPRESS_TABLE_PREFIX: ${DOCKER_WP_TABLE_PREFIX}
+      # Auth keys and salts
+      WORDPRESS_AUTH_KEY: ${DOCKER_WP_AUTH_KEY}
+      WORDPRESS_SECURE_KEY: ${DOCKER_WP_SECURE_KEY}
+      WORDPRESS_LOGGED_IN_KEY: ${DOCKER_WP_LOGGED_IN_KEY}
+      WORDPRESS_NONCE_KEY: ${DOCKER_WP_NONCE_KEY}
+      WORDPRESS_AUTH_SALT: ${DOCKER_WP_AUTH_SALT}
+      WORDPRESS_SECURE_AUTH_SALT: ${DOCKER_WP_SECURE_AUTH_SALT}
+      WORDPRESS_LOGGED_IN_SALT: ${DOCKER_WP_LOGGED_IN_SALT}
+      WORDPRESS_NONCE_SALT: ${DOCKER_WP_NONCE_SALT}
+      # Extra
+      WORDPRESS_DEBUG: 1
+      WORDPRESS_CONFIG_EXTRA: |
+        /* do not re-define WP_DEBUG here or it will throw a blank error in the admin */
+        define('FS_METHOD', 'direct');
+        define('WP_AUTO_UPDATE_CORE', false);
+
+        /* Set debug.log file to be in the plugin root */
+        define( 'WP_DEBUG_LOG', '/var/www/html/wp-content/{{wpContentLocation}}/${SLUG}/debug.log' );
+
+        /* Set no cache in dev mode */
+        define( 'WP_DEVELOPMENT_MODE', '{{boilerplateType}}' );
+    volumes:
+      - wp-content:/var/www/html/wp-content
+      - .:/var/www/html/wp-content/{{wpContentLocation}}/${SLUG}
+
+  # ============================================================================
+  # Development Mysql Database
+  # ============================================================================
+  db:
+    image: mysql:${DOCKER_MYSQL_VERSION}
+    container_name: ${SLUG}-db
+    restart: unless-stopped
+
+    environment:
+      MYSQL_DATABASE: ${DOCKER_WP_DB_NAME}
+      MYSQL_USER: ${DOCKER_WP_DB_USER}
+      MYSQL_PASSWORD: ${DOCKER_WP_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DOCKER_MYSQL_ROOT_PASSWORD}
+
+    ports:
+      - '${DOCKER_PORT_MYSQL_DEVELOPMENT}:3306'
+
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'mysqladmin',
+          'ping',
+          '-h',
+          'localhost',
+          '-u',
+          'root',
+          '-p${DOCKER_MYSQL_ROOT_PASSWORD}',
+        ]
+      interval: 2s
+      timeout: 3s
+      retries: 10
+
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  # ============================================================================
+  # PhpMyadmin
+  # ============================================================================
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: ${SLUG}-phpmyadmin
+    restart: unless-stopped
+
+    depends_on:
+      - db
+{{#installTests}}
+      - db-test
+{{/installTests}}
+
+    ports:
+      - '${DOCKER_PORT_PHPMYADMIN}:80'
+
+    environment:
+      PMA_HOSTS: db{{#installTests}},db-test{{/installTests}}
+      PMA_USER: ${DOCKER_WP_DB_USER}
+      PMA_PASSWORD: ${DOCKER_WP_DB_PASSWORD}
+{{#installTests}}
+
+  # ============================================================================
+  # Wordpress testing container
+  # ============================================================================
+  wordpress-test:
+    image: ${SLUG}-wordpress${DOCKER_WP_VERSION}-php${DOCKER_PHP_VERSION}-apache
+    container_name: ${SLUG}-wordpress-test
+    restart: unless-stopped
+
+    build:
+      context: .
+      args:
+        PHP_VERSION: ${DOCKER_PHP_VERSION}
+        WORDPRESS_VERSION: ${DOCKER_WP_VERSION}
+
+    depends_on:
+      db-test:
+        condition: service_healthy
+
+    ports:
+      - '${DOCKER_PORT_WP_TEST}:80'
+
+    environment:
+      WORDPRESS_DB_HOST: db-test
+      WORDPRESS_DB_USER: ${DOCKER_WP_DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DOCKER_WP_DB_PASSWORD}
+      WORDPRESS_DB_NAME: ${DOCKER_WP_TESTS_DB_NAME}
+      WORDPRESS_TABLE_PREFIX: ${DOCKER_WP_TESTS_TABLE_PREFIX}
+      # Auth keys and salts
+      WORDPRESS_AUTH_KEY: ${DOCKER_WP_AUTH_KEY}
+      WORDPRESS_SECURE_KEY: ${DOCKER_WP_SECURE_KEY}
+      WORDPRESS_LOGGED_IN_KEY: ${DOCKER_WP_LOGGED_IN_KEY}
+      WORDPRESS_NONCE_KEY: ${DOCKER_WP_NONCE_KEY}
+      WORDPRESS_AUTH_SALT: ${DOCKER_WP_AUTH_SALT}
+      WORDPRESS_SECURE_AUTH_SALT: ${DOCKER_WP_SECURE_AUTH_SALT}
+      WORDPRESS_LOGGED_IN_SALT: ${DOCKER_WP_LOGGED_IN_SALT}
+      WORDPRESS_NONCE_SALT: ${DOCKER_WP_NONCE_SALT}
+      # Tests vars
+      WORDPRESS_TESTS_DOMAIN: ${DOCKER_WP_TESTS_DOMAIN}
+      WORDPRESS_TESTS_EMAIL: ${DOCKER_WP_TESTS_EMAIL}
+      WORDPRESS_TESTS_TITLE: ${DOCKER_WP_TESTS_TITLE}
+
+    volumes:
+      - .:/var/www/html/wp-content/{{wpContentLocation}}/${SLUG}
+
+  # ============================================================================
+  # Wordpress testing database
+  # ============================================================================
+  db-test:
+    image: mysql:${DOCKER_MYSQL_VERSION}
+    container_name: ${SLUG}-db-test
+    restart: unless-stopped
+
+    environment:
+      MYSQL_DATABASE: ${DOCKER_WP_TESTS_DB_NAME}
+      MYSQL_USER: ${DOCKER_WP_DB_USER}
+      MYSQL_PASSWORD: ${DOCKER_WP_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DOCKER_MYSQL_ROOT_PASSWORD}
+
+    ports:
+      - '${DOCKER_PORT_MYSQL_TEST}:3306'
+
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'mysqladmin',
+          'ping',
+          '-h',
+          'localhost',
+          '-u',
+          'root',
+          '-p${DOCKER_MYSQL_ROOT_PASSWORD}',
+        ]
+      interval: 2s
+      timeout: 3s
+      retries: 10
+
+    volumes:
+      - mysql-data-test:/var/lib/mysql
+{{/installTests}}
+
+# ==============================================================================
+# Named Volumes
+# ==============================================================================
+volumes:
+  wp-content:
+  mysql-data:
+{{#installTests}}
+  mysql-data-test:
+{{/installTests}}

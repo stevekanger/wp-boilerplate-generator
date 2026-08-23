@@ -1,0 +1,207 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{phpNamespace}}\Core;
+
+/**
+ * Houses the plugin configuration.
+ *
+ * Single instance static class to get readonly plugin configuration throughout the plugin.
+ * This class is initialized once at the very begining of the plugin.
+ *
+ * @since 0.1.0
+ */
+final class PluginConfig {
+    private static ?self $instance = null;
+
+    private static $config_cache = [];
+
+    private function __construct(
+        private readonly string $version,
+        private readonly string $root_dir,
+        private readonly string $root_file,
+        private readonly string $title,
+        private readonly string $prefix,
+        private readonly string $slug,
+        private readonly string $rest_namespace,
+    ) {
+    }
+
+    /**
+     * Initialize PluginConfig exactly once.
+     *
+     * @param string $version the current version of the plugin
+     * @param string $root_dir the root directory of the plugin
+     * @param string $root_file the main plugin file in the root dir
+     * @param string $title the formal title of the plugin
+     * @param string $prefix the plugins prefix
+     * @param string $slug the plugins slug
+     *
+     * @throws \LogicException if called more than once
+     */
+    public static function init(
+        string $version,
+        string $root_dir,
+        string $root_file,
+        string $title,
+        string $prefix,
+        string $slug,
+    ): void {
+        if (null !== self::$instance) {
+            throw new \LogicException('PluginConfig has already been initialized');
+        }
+
+        self::$instance = new self(
+            $version,
+            $root_dir,
+            $root_file,
+            $title,
+            $prefix,
+            $slug,
+            $slug . '/v1',
+        );
+    }
+
+    /**
+     * Gets the plugin info instance.
+     *
+     * @return PluginConfig the instance of the plugin info
+     *
+     * @since 0.1.0
+     */
+    private static function instance(): self {
+        if (!self::$instance) {
+            throw new \RuntimeException('PluginConfig has not been initialized');
+        }
+
+        return self::$instance;
+    }
+
+    /**
+     * Gets the current version of the plugin.
+     *
+     * @return string The plugin version
+     *
+     * @since 0.1.0
+     */
+    public static function version() {
+        return self::instance()->version;
+    }
+
+    /**
+     * Gets the root plugin directory.
+     *
+     * @param string $path Optional. Any path you want to append (requires you to add the preceeding /)
+     *
+     * @since 0.1.0
+     */
+    public static function root_dir(string $path = ''): string {
+        return self::instance()->root_dir . $path;
+    }
+
+    /**
+     * Gets the root plugin directory url.
+     *
+     * @param string $path Optional. Any path you want to append (requires you to add the preceeding /)
+     *
+     * @since 0.1.0
+     */
+    public static function root_dir_url(string $path = ''): string {
+        return rtrim(plugin_dir_url(self::root_file()), '/') . $path;
+    }
+
+    /**
+     * Gets the root plugin file.
+     *
+     * @since 0.1.0
+     */
+    public static function root_file(): string {
+        return self::instance()->root_file;
+    }
+
+    /**
+     * Gets the plugin title.
+     *
+     * @since 0.1.0
+     */
+    public static function title(): string {
+        return self::instance()->title;
+    }
+
+    /**
+     * Gets the plugin prefix.
+     *
+     * @param string $suffix Optional. Any string you want to append
+     *
+     * @since 0.1.0
+     */
+    public static function prefix(string $suffix = ''): string {
+        $prefix = self::instance()->prefix;
+
+        return '' !== $suffix ? "{$prefix}_{$suffix}" : $prefix;
+    }
+
+    /**
+     * Gets the plugin slug.
+     *
+     * @param string $suffix Optional. Any string you want to append
+     *
+     * @since 0.1.0
+     */
+    public static function slug(string $suffix = ''): string {
+        $slug = self::instance()->slug;
+
+        return '' !== $suffix ? "{$slug}-{$suffix}" : $slug;
+    }
+
+    /**
+     * Gets a plugins api path appended to the rest namespace.
+     *
+     * Note: Calling with no $path argument will return the api namespace
+     *
+     * @param string $path Optional. Any path you want to append
+     *
+     * @since 0.1.0
+     */
+    public static function rest_path(string $path = ''): string {
+        return self::instance()->rest_namespace . $path;
+    }
+
+    /**
+     * Gets a plugins full api url with path appended to the rest namespace.
+     *
+     * Note: Calling with no $path argument will return the api namespace
+     *
+     * @param string $path Optional. Any path you want to append
+     *
+     * @since 0.1.0
+     */
+    public static function rest_url(string $path = ''): string {
+        return rest_url(self::rest_path($path));
+    }
+
+    /**
+     * Gets the config from the config file in the config directory.
+     *
+     * @param string $name The name of the config file (without .php)
+     *
+     * @since 0.1.0
+     */
+    public static function config(string $name): array {
+        // Use a cache to avoid re-reading the file during the same request
+        if (isset(self::$config_cache[$name])) {
+            return self::$config_cache[$name];
+        }
+
+        $path = self::root_dir("/inc/config/{$name}.php");
+
+        if (file_exists($path)) {
+            self::$config_cache[$name] = require $path;
+
+            return self::$config_cache[$name];
+        }
+
+        return [];
+    }
+}

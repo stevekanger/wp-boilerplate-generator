@@ -1,0 +1,90 @@
+import fs from 'fs';
+import packageJson from '../../package.json';
+import getEnv from '../utils/getEnv';
+import getRootDir from '../utils/getRootDir';
+import config from '../../dev-tools.json'
+
+const { entry } = config;
+
+/**
+ * Gets the version from header comment.
+ *
+ * @param {string} filePath The path to the file
+ * @return array
+ *
+ * @since 0.1.0
+ */
+async function getHeaderVersion(filePath: string) {
+  const content = await fs.promises.readFile(filePath, 'utf8');
+
+  /**
+   * Matches the version from the docblock header.
+   *
+   * Example matched line:
+   *   * Version: 0.1.0
+   *
+   * Breakdown:
+   *   Version:  = literal docblock "Version:" line
+   *   \s*          = optional whitespace after the colon
+   *   ([0-9.]+)    = captures the version number (digits and dots)
+   *
+   * match[1] will contain the version string.
+   */
+  const headerMatch = content.match(/Version:\s*([0-9.]+)/);
+
+  if (!headerMatch || !headerMatch[1]) {
+    throw new Error('Could not find the version in header.');
+  }
+
+  return headerMatch[1];
+}
+
+/**
+ * Logs the package versions in command line
+ *
+ * @param {string} packageVersion
+ * @param {string} headerVersion
+ * @returns void
+ *
+ * @since 0.1.0
+ */
+function showVersions(packageVersion: string, headerVersion: string) {
+  console.log(`
+=========================================
+Versions 
+-----------------------------------------
+package.json = ${packageVersion} 
+${entry} = ${headerVersion}
+=========================================
+  `);
+}
+
+/**
+ * Gets the version
+ *
+ * Checks all files that should contain a version.
+ * Checks whether all versions are the same and return the version.
+ *
+ * @returns string
+ *
+ * @since 0.1.0
+ */
+export default async function getVersion() {
+  const packageVersion = packageJson.version;
+  const entryFilePath = getRootDir(entry);
+
+  if (!fs.existsSync(entryFilePath)) {
+    throw new Error(`No entry file found at ${entryFilePath}`);
+  }
+
+  const headerVersion = await getHeaderVersion(entryFilePath);
+  const versions = [packageVersion, headerVersion];
+  const allMatch = versions.every((v) => v === packageVersion);
+
+  if (!allMatch) {
+    showVersions(packageVersion, headerVersion);
+    throw new Error('You have mismatch versions in your files.');
+  }
+
+  return packageVersion;
+}

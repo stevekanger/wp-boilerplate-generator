@@ -1,0 +1,38 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{phpNamespace}}\Core;
+
+defined('ABSPATH') || exit;
+
+/**
+ * Base Service class.
+ *
+ * Services intended to be external Services. Api's, Databases, ect.
+ * Extend this class to create your service.
+ *
+ * @since 0.1.0
+ */
+abstract class Service {
+    /**
+     * Construct the service attributes.
+     *
+     * @param Container $container the service container instance
+     *
+     * @since 0.1.0
+     */
+    public function __construct(
+        protected Container $container,
+    ) {
+    }
+
+    /**
+     * Register anything you need here.
+     *
+     * Override this in your extended controller.
+     *
+     * @since 0.1.0
+     */
+    abstract public function register(): void;
+}

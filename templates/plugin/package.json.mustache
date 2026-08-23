@@ -1,0 +1,46 @@
+{
+  "name": "{{slug}}",
+  "version": "0.1.0",
+  "description": "{{description}}",
+  "license": "GPL-2.0-or-later",
+  "scripts": {
+{{#installTests}}
+    "test": "vitest",
+{{/installTests}}
+    "dev": "wp-scripts start",
+    "build": "wp-scripts build",
+    "archive:dist": "composer install --no-dev && wp-scripts build && tsx ./dev-tools/archive && composer install",
+    "archive:dev": "tsx ./dev-tools/archive dev",
+    "docker:shell": "docker exec -it {{slug}}-wordpress /bin/bash",
+    "docker:extract": "tsx ./dev-tools/docker/extract.ts {{slug}}-wordpress",
+    "create:block": "tsx ./dev-tools/createBlock"
+  },
+  "devDependencies": {
+{{#installTests}}
+    "vitest": "^4.1.11",
+{{/installTests}}
+    "@types/archiver": "^8.0.0",
+    "@types/mustache": "^4.2.6",
+    "@types/node": "^26.2.0",
+    "@types/react": "18.3.27",
+    "@types/react-dom": "18.3.7",
+    "@types/wordpress__block-editor": "^15.0.6",
+    "@wordpress/components": "^39.0.0",
+    "@wordpress/element": "^8.5.0",
+    "@wordpress/i18n": "^6.26.0",
+    "@wordpress/scripts": "^34.1.0",
+    "archiver": "^8.0.0",
+    "browser-sync-webpack-plugin": "^2.4.0",
+    "dotenv": "^17.4.2",
+    "mustache": "^4.2.0",
+    "prettier": "^3.9.6",
+    "tsx": "^4.23.12",
+    "typescript": "^6.0.3"
+  },
+  "overrides": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "@types/react": "18.3.27",
+    "@types/react-dom": "18.3.7"
+  }
+}

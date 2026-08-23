@@ -1,0 +1,47 @@
+{
+  "entry": "{{slug}}.php",
+  "blocks": {
+    "createBlock": {
+      "namespace": "{{slug}}",
+      "json": {
+        "textdomain": "{{slug}}"
+      }
+    }
+  },
+  "archive": {
+    "includedDist": [
+      "{{slug}}.php",
+      "assets",
+      "build",
+      "inc",
+      "vendor",
+      "license.txt",
+      "readme.txt"
+    ],
+    "includedDev": [
+      "{{slug}}.php",
+      "assets",
+      "dev-tools",
+      "inc",
+      "src",
+      "tests",
+      ".example.env",
+      ".gitignore",
+      ".php-cs-fixer.dist.php",
+      ".prettierignore",
+      ".prettierrc",
+      "composer.json",
+      "dev-tools.json",
+      "docker-compose.yml",
+      "Dockerfile",
+      "license.txt",
+      "package.json",
+      "phpunit.xml",
+      "README.md",
+      "readme.txt",
+      "tsconfig.json",
+      "vitest.config.ts",
+      "webpack.config.js"
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{phpNamespace}}\Core;
+
+defined('ABSPATH') || exit;
+
+/**
+ * Base controller class.
+ *
+ * Controllers are intended to be your connection to wordpress. Hooks and filters ect.
+ * Extend this class to create your own controller.
+ *
+ * @since 0.1.0
+ */
+abstract class Controller {
+    /**
+     * Construct the controller attributes.
+     *
+     * @since 0.1.0
+     */
+    public function __construct(
+        protected Container $container,
+    ) {
+    }
+
+    /**
+     * Register your hooks, filters, ect here.
+     *
+     * Override this in your extended controller.
+     *
+     * @since 0.1.0
+     */
+    abstract public function register(): void;
+}

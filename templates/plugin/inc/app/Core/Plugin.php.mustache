@@ -1,0 +1,92 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{phpNamespace}}\Core;
+
+use {{phpNamespace}}\Controllers\AssetController;
+use {{phpNamespace}}\Controllers\BlockController;
+
+defined('ABSPATH') || exit;
+
+/**
+ * Main plugin class.
+ *
+ * Responsible for activation/deactivation, service container, and other plugin related functions
+ *
+ * @since 0.1.0
+ */
+final class Plugin {
+    /**
+     * Setup the plugins attributes.
+     *
+     * @param Container $container The plugin service container
+     *
+     * @since 0.1.0
+     */
+    public function __construct(
+        private Container $container,
+    ) {
+    }
+
+    /**
+     * Initializes the plugin, adds activation/deactivation hooks, binds services/controllers to service container.
+     *
+     * @since 0.1.0
+     */
+    public function init(): void {
+        // Bind controllers and services to the contianer
+        $this->container->bind(AssetController::class, function(Container $container) {
+            return new AssetController($container);
+        });
+
+        $this->container->bind(BlockController::class, function(Container $container) {
+            return new BlockController($container);
+        });
+
+        // Initialize controllers and services if needed
+        add_action('plugins_loaded', [$this, 'plugins_loaded']);
+
+        // Plugin activation hooks
+        $root_file = PluginConfig::root_file();
+        register_activation_hook($root_file, [$this, 'activate']);
+        register_deactivation_hook($root_file, [$this, 'deactivate']);
+    }
+
+    /**
+     * Register all controllers and services when plugins are loaded.
+     *
+     * @since 0.1.0
+     */
+    public function plugins_loaded(): void {
+        $this->container->get(AssetController::class)->register();
+        $this->container->get(BlockController::class)->register();
+    }
+
+    /**
+     * Get container.
+     *
+     * @since 0.1.0
+     */
+    public function get_container(): Container {
+        return $this->container;
+    }
+
+    /**
+     * Plugin activation hook.
+     *
+     * @since 0.1.0
+     */
+    public function activate(): void {
+        flush_rewrite_rules();
+    }
+
+    /**
+     * Plugin deactivation hook.
+     *
+     * @since 0.1.0
+     */
+    public function deactivate(): void {
+        flush_rewrite_rules();
+    }
+}
