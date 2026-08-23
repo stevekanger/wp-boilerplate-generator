@@ -6,6 +6,21 @@ import config from '../../dev-tools.json'
 const { entry } = config;
 
 /**
+ * Matches the version from the docblock header.
+ *
+ * Example matched line:
+ *   * Version: 0.1.0
+ *
+ * Breakdown:
+ *   Version:  = literal docblock "Version:" line
+ *   \s*          = optional whitespace after the colon
+ *   ([0-9.]+)    = captures the version number (digits and dots)
+ *
+ * match[1] will contain the version string.
+ */
+const headerMatchRegex = /Version:\s*([0-9.]+)/;
+
+/**
  * Gets the version from header comment.
  *
  * @param {string} filePath The path to the file
@@ -16,20 +31,7 @@ const { entry } = config;
 async function getHeaderVersion(filePath: string) {
   const content = await fs.promises.readFile(filePath, 'utf8');
 
-  /**
-   * Matches the version from the docblock header.
-   *
-   * Example matched line:
-   *   * Version: 0.1.0
-   *
-   * Breakdown:
-   *   Version:  = literal docblock "Version:" line
-   *   \s*          = optional whitespace after the colon
-   *   ([0-9.]+)    = captures the version number (digits and dots)
-   *
-   * match[1] will contain the version string.
-   */
-  const headerMatch = content.match(/Version:\s*([0-9.]+)/);
+  const headerMatch = content.match(headerMatchRegex);
 
   if (!headerMatch || !headerMatch[1]) {
     throw new Error('Could not find the version in header.');
