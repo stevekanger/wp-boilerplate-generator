@@ -2,13 +2,15 @@
 
 Generates a theme or plugin boilerplate for wordpress.
 
-These are not base boilerplates in structure or tooling. Developer tools include docker, webpack, composer autoloading, and some other custom scripts. Each boilerplate has it's own `README.md` with documentation.
+These are not base boilerplates in structure or tooling. Developer tools include docker, webpack, composer autoloading, and some other custom scripts.
 
 ## Usage
 
 Clone or download the repository
 
 ```bash
+npm install
+
 npm start
 
 ```
@@ -71,4 +73,4 @@ The wordpress testing suits are installed from `https://develop.svn.wordpress.or
 
 ## License
 
-This software is licensed under the MIT license. See [LICENSE](https://github.com/stevekanger/wp-boilerplate-generator/blob/main/LICENSE) for more information.
+This software is licensed under the GPLG license. See [LICENSE](https://github.com/stevekanger/wp-boilerplate-generator/blob/main/LICENSE) for more information.
