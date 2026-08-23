@@ -2,9 +2,9 @@
 
 Generates a theme or plugin boilerplate for wordpress.
 
-These are not base boilerplates in structure or tooling. Developer tools include docker, webpack, composer autoloading, and some other custom scripts.
+These are full featured and modern boilerplates in both structure and tooling. Developer tools include docker, webpack, composer autoloading, and other custom scripts.
 
-## Usage
+## Installation And Usage
 
 Clone or download the repository
 
@@ -35,7 +35,7 @@ npm run dev
 
 ```
 
-## Boilerplate Usage
+## Boilerplates
 
 ### Folder Structure
 
