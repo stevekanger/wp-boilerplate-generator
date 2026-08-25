@@ -59,11 +59,13 @@ async function getWpData(): Promise<{
  *
  * @param {string} destDir The destination directory
  * @param {string} fileName The name of the file relative to destDir
+ * @param {boolean} isRenderableMustache Wether to render the mustache file or not
  * @param {TemplateVars} vars The template variables
  */
 function getDestPath(
   destDir: string,
   fileName: string,
+  isRenderableMustache: boolean,
   vars: TemplateVars,
 ): string {
   const parsed = path.parse(path.join(destDir, fileName));
@@ -73,7 +75,7 @@ function getDestPath(
     parsed.name = parsed.name.replace("[slug]", vars.slug);
   }
 
-  if (parsed.ext === ".mustache" && !excludeMustacheRender.includes(fileName)) {
+  if (isRenderableMustache) {
     return `${parsed.dir}/${parsed.name}`;
   }
 
@@ -95,17 +97,21 @@ async function renderFiles(
   const files = getDirectoryFiles(srcDir);
 
   files.forEach((fileName) => {
-    const isMustache = fileName.endsWith(".mustache");
+    const isRenderableMustache =
+      fileName.endsWith(".mustache") &&
+      !excludeMustacheRender.includes(fileName);
+
     const srcPath = path.join(srcDir, fileName);
-    const destPath = getDestPath(destDir, fileName, vars);
+    const destPath = getDestPath(destDir, fileName, isRenderableMustache, vars);
 
-    fs.mkdirSync(path.dirname(destPath), { recursive: true });
-
-    if (isMustache && !excludeMustacheRender.includes(fileName)) {
+    if (isRenderableMustache) {
       const fileContents = fs.readFileSync(srcPath, "utf8");
       const rendered = mustache.render(fileContents, vars);
 
-      fs.writeFileSync(destPath, rendered, "utf8");
+      if (rendered) {
+        fs.mkdirSync(path.dirname(destPath), { recursive: true });
+        fs.writeFileSync(destPath, rendered, "utf8");
+      }
     } else {
       fs.cpSync(srcPath, destPath);
     }
