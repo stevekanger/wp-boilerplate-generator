@@ -1,4 +1,4 @@
-import fs from 'fs'
+import fs from "fs";
 import { BoilerplateType, TemplateVars } from "./types";
 import commandLinePrompt from "./utils/commandLinePrompt";
 import getRootDir from "./utils/getRootDir";
@@ -62,7 +62,7 @@ export async function promptAuthorHandle(author: string): Promise<string> {
   const fromAuthor = author.toLowerCase().replaceAll(" ", "");
 
   const answer = await commandLinePrompt(
-    `Author Handle (eg. johndoe)(Default: ${fromAuthor}): `,
+    `Author Handle (Default: ${fromAuthor}): `,
   );
 
   return answer || fromAuthor;
@@ -159,10 +159,12 @@ export async function promptInstallPath(slug: string): Promise<string> {
   const selectedPath = answer || defaultPath;
 
   if (fs.existsSync(selectedPath)) {
-    const confirmed = await commandLinePrompt(`\nThe directory at ${selectedPath} is not empty. Area you sure you want to overwrite the files. This action will replace the files currently in place. This cannot be undone.\n\nEnter "I understand" to proceed: `)
+    const confirmed = await commandLinePrompt(
+      `\nThe directory at ${selectedPath} is not empty. Area you sure you want to overwrite the files. This action will replace the files currently in place. This cannot be undone.\n\nEnter "I understand" to proceed: `,
+    );
 
     if (confirmed.toLowerCase() !== "i understand") {
-      throw new Error("Aborting.")
+      throw new Error("Aborting.");
     }
   }
 

@@ -21,7 +21,7 @@ export default async function commandLinePrompt(
       rl.question(question, resolve),
     );
 
-    return response;
+    return response.trim();
   } catch (err) {
     throw err;
   } finally {

@@ -28,6 +28,7 @@ const excludeMustacheRender = [
   "dev-tools/createBlock/templates/render.php.mustache",
   "dev-tools/createBlock/templates/save.tsx.mustache",
   "dev-tools/createBlock/templates/style.scss.mustache",
+  "dev-tools/createBlock/templates/types.ts.mustache",
   "dev-tools/createBlock/templates/view.ts.mustache",
 ];
 
@@ -54,40 +55,59 @@ async function getWpData(): Promise<{
 }
 
 /**
+ * Gets the destination file path
+ *
+ * @param {string} destDir The destination directory
+ * @param {string} fileName The name of the file relative to destDir
+ * @param {TemplateVars} vars The template variables
+ */
+function getDestPath(
+  destDir: string,
+  fileName: string,
+  vars: TemplateVars,
+): string {
+  const parsed = path.parse(path.join(destDir, fileName));
+
+  if (parsed.base.includes("[slug]")) {
+    parsed.base = parsed.base.replace("[slug]", vars.slug);
+    parsed.name = parsed.name.replace("[slug]", vars.slug);
+  }
+
+  if (parsed.ext === ".mustache" && !excludeMustacheRender.includes(fileName)) {
+    return `${parsed.dir}/${parsed.name}`;
+  }
+
+  return `${parsed.dir}/${parsed.base}`;
+}
+
+/**
  * Render template files from directory
  *
- * @param fromPath The path of the template files
- * @param toPath The path to render to
+ * @param srcDir The path of the template files
+ * @param destDir The path to render to
  * @param vars The mustache template variables
  */
 async function renderFiles(
-  fromPath: string,
-  toPath: string,
+  srcDir: string,
+  destDir: string,
   vars: TemplateVars,
 ) {
-  const files = getDirectoryFiles(fromPath);
+  const files = getDirectoryFiles(srcDir);
 
   files.forEach((fileName) => {
-    const fileContents = fs.readFileSync(path.join(fromPath, fileName), "utf8");
-
-    const basename = path.basename(fileName);
-
-    if (basename.startsWith("[slug]")) {
-      fileName = basename.replace("[slug]", vars.slug);
-    }
-
     const isMustache = fileName.endsWith(".mustache");
-    const filePath = path.join(toPath, fileName);
-    fs.mkdirSync(path.dirname(filePath), { recursive: true });
+    const srcPath = path.join(srcDir, fileName);
+    const destPath = getDestPath(destDir, fileName, vars);
+
+    fs.mkdirSync(path.dirname(destPath), { recursive: true });
 
     if (isMustache && !excludeMustacheRender.includes(fileName)) {
+      const fileContents = fs.readFileSync(srcPath, "utf8");
       const rendered = mustache.render(fileContents, vars);
 
-      fileName = fileName.slice(0, -".mustache".length);
-
-      fs.writeFileSync(path.join(toPath, fileName), rendered, "utf8");
+      fs.writeFileSync(destPath, rendered, "utf8");
     } else {
-      fs.writeFileSync(filePath, fileContents, "utf8");
+      fs.cpSync(srcPath, destPath);
     }
   });
 }
