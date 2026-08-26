@@ -36,22 +36,43 @@ const excludeMustacheRender = [
  * Gets the latest wordpress version from api
  */
 async function getWpData(): Promise<{
-  version: string;
+  wpVersion: string;
   phpVersion: string;
 }> {
-  const res = await fetch("https://api.wordpress.org/core/version-check/1.7/");
-
-  if (res.status !== 200) {
-    throw new Error(
-      "Failed fetching wordpress version data. Please try again shortly.",
+  try {
+    const wpVersionRes = await fetch(
+      "https://api.wordpress.org/core/version-check/1.7/",
     );
-  }
-  const data = await res.json();
 
-  return {
-    version: data.offers[0].version,
-    phpVersion: data.offers[0].php_version,
-  };
+    if (wpVersionRes.status !== 200) {
+      throw new Error(
+        "Failed fetching wordpress version data. Please try again shortly.",
+      );
+    }
+
+    const wpVersionData = await wpVersionRes.json();
+    const wpVersion = wpVersionData.offers[0].version;
+    const minPhp = wpVersionData.offers[0].php_version;
+
+    const phpVersionRes = await fetch(
+      `https://api.wordpress.org/core/serve-happy/1.0/?php_version=${minPhp}`,
+    );
+
+    if (phpVersionRes.status !== 200) {
+      throw new Error(
+        "Failed fetching wordpress php version data. Please try again shortly.",
+      );
+    }
+
+    const { recommended_version: phpVersion } = await phpVersionRes.json();
+
+    return {
+      wpVersion,
+      phpVersion,
+    };
+  } catch (err) {
+    throw err;
+  }
 }
 
 /**
@@ -132,7 +153,7 @@ async function main() {
     const slug = await promptSlug(title);
     const prefix = await promptPrefix(title);
     const phpNamespace = await promptPhpNamespace(title);
-    const wordpressVersion = await promptWordpressVersion(wpData.version);
+    const wordpressVersion = await promptWordpressVersion(wpData.wpVersion);
     const phpVersion = await promptPhpVersion(wpData.phpVersion);
     const installPath = await promptInstallPath(slug);
     const installTests = await promptInstallTests();

@@ -4,10 +4,50 @@ declare(strict_types=1);
 
 namespace {{phpNamespace}};
 
+use {{phpNamespace}}\Core\Container;
+use {{phpNamespace}}\Core\Theme;
+use {{phpNamespace}}\Core\Config;
+
 defined('ABSPATH') || exit;
 
+// Require autoloader
 require_once __DIR__ . '/vendor/autoload.php';
 
-// Create a new instance of the theme and init
-$theme = new Theme();
-$theme->init();
+/*
+ * Initialize the config information.
+ *
+ * @since 0.1.0
+ */
+Config::init(
+    get_file_data(__DIR__ . '/style.css', ['Version' => 'Version'])['Version'] ?: '0.1.0',
+    __DIR__,
+    __FILE__,
+    '{{title}}',
+    '{{prefix}}',
+    '{{slug}}',
+);
+
+/**
+ * Get the instance.
+ *
+ * If there is no running instance then initialize and assign it to the $instance.
+ *
+ * @since 0.1.0
+ */
+function get_theme(): Theme {
+    static $instance = null;
+
+    if (!$instance) {
+        // Setup dependencies
+        $container = new Container();
+
+        // Create the instance
+        $instance = new Theme($container);
+        $instance->init();
+    }
+
+    return $instance;
+}
+
+// Start the theme
+$theme = get_theme();

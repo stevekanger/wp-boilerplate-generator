@@ -12,7 +12,7 @@ defined('ABSPATH') || exit;
 /**
  * Main plugin class.
  *
- * Responsible for activation/deactivation, service container, and other plugin related functions
+ * Responsible for activation/deactivation, service container, etc
  *
  * @since 0.1.0
  */
@@ -20,7 +20,7 @@ final class Plugin {
     /**
      * Setup the plugins attributes.
      *
-     * @param Container $container The plugin service container
+     * @param Container $container The service container
      *
      * @since 0.1.0
      */
@@ -48,7 +48,7 @@ final class Plugin {
         add_action('plugins_loaded', [$this, 'plugins_loaded']);
 
         // Plugin activation hooks
-        $root_file = PluginConfig::root_file();
+        $root_file = Config::root_file();
         register_activation_hook($root_file, [$this, 'activate']);
         register_deactivation_hook($root_file, [$this, 'deactivate']);
     }

@@ -215,7 +215,9 @@ async function createBlock() {
     const templates = await fs.readdir(path.join(templateDir));
     await createTemplateFiles(templateDir, outputDir, templates, templateVars);
 
-    console.log(`New block "${slug}" created successfully!`);
+    console.log(
+      `New block "${slug}" created! To register your block add the block slug to BlockController::REGISTERED_BLOCKS array.`,
+    );
   } catch (err) {
     console.log(err);
   }

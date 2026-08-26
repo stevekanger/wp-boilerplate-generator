@@ -23,7 +23,7 @@ namespace {{phpNamespace}};
 
 use {{phpNamespace}}\Core\Container;
 use {{phpNamespace}}\Core\Plugin;
-use {{phpNamespace}}\Core\PluginConfig;
+use {{phpNamespace}}\Core\Config;
 
 defined('ABSPATH') || exit;
 
@@ -31,14 +31,12 @@ defined('ABSPATH') || exit;
 require_once __DIR__ . '/vendor/autoload.php';
 
 /*
- * Initialize the plugin config information.
- *
- * Remember to update the version here for every release.
+ * Initialize the config information.
  *
  * @since 0.1.0
  */
-PluginConfig::init(
-    get_file_data(__FILE__, ['Version' => 'Version'])['Version'] ?? '0.1.0',
+Config::init(
+    get_file_data(__FILE__, ['Version' => 'Version'])['Version'] ?: '0.1.0',
     __DIR__,
     __FILE__,
     '{{title}}',
@@ -47,7 +45,7 @@ PluginConfig::init(
 );
 
 /**
- * Get the plugin instance.
+ * Get the instance.
  *
  * If there is no running instance then initialize and assign it to the $instance.
  *
@@ -57,10 +55,10 @@ function get_plugin(): Plugin {
     static $instance = null;
 
     if (!$instance) {
-        // Setup plugin dependencies
+        // Setup dependencies
         $container = new Container();
 
-        // Setup the plugin
+        // Create the instance
         $instance = new Plugin($container);
         $instance->init();
     }

@@ -1,0 +1,62 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{phpNamespace}}\Core;
+
+use {{phpNamespace}}\Controllers\AssetController;
+
+defined('ABSPATH') || exit;
+
+/**
+ * Main theme class.
+ *
+ * Responsible for activation/deactivation, service container, etc.
+ *
+ * @since 0.1.0
+ */
+final class Theme {
+    /**
+     * Setup the plugins attributes.
+     *
+     * @param Container $container The plugin service container
+     *
+     * @since 0.1.0
+     */
+    public function __construct(
+        private Container $container,
+    ) {
+    }
+
+    /**
+     * Initializes the theme, binds services/controllers to service container.
+     *
+     * @since 0.1.0
+     */
+    public function init(): void {
+        // Bind controllers and services to the contianer
+        $this->container->bind(AssetController::class, function(Container $container) {
+            return new AssetController($container);
+        });
+
+        $this->register();
+    }
+
+    /**
+     * Register all controllers and services.
+     *
+     * @since 0.1.0
+     */
+    public function register(): void {
+        $this->container->get(AssetController::class)->register();
+    }
+
+    /**
+     * Get container.
+     *
+     * @since 0.1.0
+     */
+    public function get_container(): Container {
+        return $this->container;
+    }
+}

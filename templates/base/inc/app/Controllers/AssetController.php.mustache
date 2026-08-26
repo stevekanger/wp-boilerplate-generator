@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace {{phpNamespace}}\Controllers;
 
 use {{phpNamespace}}\Core\Controller;
-use {{phpNamespace}}\Core\PluginConfig;
+use {{phpNamespace}}\Core\Config;
 
 defined('ABSPATH') || exit;
 
@@ -36,19 +36,19 @@ final class AssetController extends Controller {
     public function enqueue_client_assets(): void {
         // enqueue js
         wp_enqueue_script(
-            PluginConfig::prefix('client'),
-            PluginConfig::root_dir_url('/build/client/index.js'),
+            Config::prefix('client'),
+            Config::root_dir_url('/build/client/index.js'),
             [],
-            PluginConfig::version(),
+            Config::version(),
             [],
         );
 
         // enqueue css
         wp_enqueue_style(
-            PluginConfig::prefix('client'),
-            PluginConfig::root_dir_url('/build/client/index.css'),
+            Config::prefix('client'),
+            Config::root_dir_url('/build/client/index.css'),
             [],
-            PluginConfig::version(),
+            Config::version(),
         );
     }
 
@@ -62,19 +62,19 @@ final class AssetController extends Controller {
     public function enqueue_admin_assets() {
         // enqueue js
         wp_enqueue_script(
-            PluginConfig::prefix('admin'),
-            PluginConfig::root_dir_url('/build/admin/index.js'),
+            Config::prefix('admin'),
+            Config::root_dir_url('/build/admin/index.js'),
             [],
-            PluginConfig::version(),
+            Config::version(),
             [],
         );
 
         // enqueue css
         wp_enqueue_style(
-            PluginConfig::prefix('admin'),
-            PluginConfig::root_dir_url('/build/admin/index.css'),
+            Config::prefix('admin'),
+            Config::root_dir_url('/build/admin/index.css'),
             [],
-            PluginConfig::version(),
+            Config::version(),
         );
     }
 }

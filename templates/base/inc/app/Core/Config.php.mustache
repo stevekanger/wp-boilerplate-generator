@@ -1,0 +1,193 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{phpNamespace}}\Core;
+
+/**
+ * Houses the configuration.
+ *
+ * Single instance static class to get readonly configuration.
+ *
+ * @since 0.1.0
+ */
+final class Config {
+    private static ?self $instance = null;
+
+    private function __construct(
+        private readonly string $version,
+        private readonly string $root_dir,
+        private readonly string $root_file,
+        private readonly string $title,
+        private readonly string $prefix,
+        private readonly string $slug,
+    ) {
+    }
+
+    /**
+     * Initialize Config exactly once.
+     *
+     * @param string $version the current version
+     * @param string $root_dir the root directory
+     * @param string $root_file the main file in the root dir
+     * @param string $title the formal title
+     * @param string $prefix the prefix
+     * @param string $slug the slug
+     *
+     * @throws \LogicException if called more than once
+     */
+    public static function init(
+        string $version,
+        string $root_dir,
+        string $root_file,
+        string $title,
+        string $prefix,
+        string $slug,
+    ): void {
+        if (null !== self::$instance) {
+            throw new \LogicException('Config has already been initialized');
+        }
+
+        self::$instance = new self(
+            $version,
+            $root_dir,
+            $root_file,
+            $title,
+            $prefix,
+            $slug,
+        );
+    }
+
+    /**
+     * Gets the config instance.
+     *
+     * @return Config the instance of the config
+     *
+     * @since 0.1.0
+     */
+    private static function instance(): self {
+        if (!self::$instance) {
+            throw new \RuntimeException('Config has not been initialized');
+        }
+
+        return self::$instance;
+    }
+
+    /**
+     * Gets the current version.
+     *
+     * @return string The version
+     *
+     * @since 0.1.0
+     */
+    public static function version() {
+        return self::instance()->version;
+    }
+
+    /**
+     * Gets the root directory.
+     *
+     * @param string $path Optional. Any path you want to append (requires you to add the preceeding /)
+     *
+     * @since 0.1.0
+     */
+    public static function root_dir(string $path = ''): string {
+        return self::instance()->root_dir . $path;
+    }
+
+    /**
+     * Gets the root file.
+     *
+     * @since 0.1.0
+     */
+    public static function root_file(): string {
+        return self::instance()->root_file;
+    }
+
+    /**
+     * Gets the title.
+     *
+     * @since 0.1.0
+     */
+    public static function title(): string {
+        return self::instance()->title;
+    }
+
+    /**
+     * Gets the prefix.
+     *
+     * @param string $suffix Optional. Any string you want to append
+     *
+     * @since 0.1.0
+     */
+    public static function prefix(string $suffix = ''): string {
+        $prefix = self::instance()->prefix;
+
+        return '' !== $suffix ? "{$prefix}_{$suffix}" : $prefix;
+    }
+
+    /**
+     * Gets the slug.
+     *
+     * @param string $suffix Optional. Any string you want to append
+     *
+     * @since 0.1.0
+     */
+    public static function slug(string $suffix = ''): string {
+        $slug = self::instance()->slug;
+
+        return '' !== $suffix ? "{$slug}-{$suffix}" : $slug;
+    }
+{{#isTheme}}
+
+    /**
+     * Gets the root directory url.
+     *
+     * @param string $path Optional. Any path you want to append (requires you to add the preceeding /)
+     *
+     * @since 0.1.0
+     */
+    public static function root_dir_url(string $path = ''): string {
+        return get_template_directory_uri() . $path;
+    }
+{{/isTheme}}
+{{#isPlugin}}
+
+    /**
+     * Gets the root directory url.
+     *
+     * @param string $path Optional. Any path you want to append (requires you to add the preceeding /)
+     *
+     * @since 0.1.0
+     */
+    public static function root_dir_url(string $path = ''): string {
+        return rtrim(plugin_dir_url(self::root_file()), '/') . $path;
+    }
+
+    /**
+     * Gets api path appended to the rest namespace.
+     *
+     * Note: Calling with no $path argument will return the api namespace
+     *
+     * @param string $path Optional. Any path you want to append (requires you to add the preceeding /)
+     *
+     * @since 0.1.0
+     */
+    public static function rest_path(string $path = ''): string {
+        return self::instance()->slug() . '/v1' . $path;
+    }
+
+    /**
+     * Gets the full api url with path appended to the rest namespace.
+     *
+     * Note: Calling with no $path argument will return the api namespace
+     *
+     * @param string $path Optional. Any path you want to append (requires you to add the preceeding /)
+     *
+     * @since 0.1.0
+     */
+    public static function rest_url(string $path = ''): string {
+        return rest_url(self::rest_path($path));
+    }
+{{/isPlugin}}
+}
