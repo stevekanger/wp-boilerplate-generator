@@ -1,8 +1,10 @@
 export type BoilerplateType = "plugin" | "theme";
+export type BoilerplateTypeProper = "Plugin" | "Theme";
 export type WpContentLocation = "plugins" | "themes";
 
 export interface TemplateVars {
   type: BoilerplateType;
+  typeProper: BoilerplateTypeProper;
   isPlugin: boolean;
   isTheme: boolean;
   title: string;

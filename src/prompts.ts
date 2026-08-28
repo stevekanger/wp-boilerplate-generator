@@ -222,7 +222,7 @@ Php version: ${phpVersion}
 Install Path: ${installPath}
 Install Tests: ${installTests ? "Yes" : "No"}
 
-is this correct? (y/n): `);
+Is this correct? (y/n): `);
 
   if (answer !== "y") {
     throw new Error("Data not confirmed. Aborting.");

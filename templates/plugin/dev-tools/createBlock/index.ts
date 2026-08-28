@@ -216,7 +216,7 @@ async function createBlock() {
     await createTemplateFiles(templateDir, outputDir, templates, templateVars);
 
     console.log(
-      `New block "${slug}" created! To register your block add the block slug to BlockController::REGISTERED_BLOCKS array.`,
+      `New block "${slug}" created! Now to register the block add your block slug to BlockController::REGISTERED_BLOCKS array.`,
     );
   } catch (err) {
     console.log(err);

@@ -14,9 +14,18 @@ final class Container {
     private array $instances = [];
 
     /**
+     * Get all bound IDs.
+     *
+     * @since 0.1.0
+     */
+    public function get_ids(): array {
+        return array_keys($this->bindings);
+    }
+
+    /**
      * Bind services to the class.
      *
-     * @param string   $id      Any string id to act as the service key
+     * @param string $id Any string id to act as the service key
      * @param callable $factory A function that returns an instance of the Service
      *
      * @since 0.1.0
@@ -37,12 +46,12 @@ final class Container {
      * @since 0.1.0
      */
     public function get(string $id): mixed {
-        if (!isset($this->instances[$id])) {
-            $this->instances[$id] = $this->bindings[$id]($this);
+        if (!isset($this->bindings[$id])) {
+            throw new \RuntimeException("No container binding found for {$id}");
         }
 
-        if (!isset($this->bindings[$id])) {
-            throw new \Exception("No container binding found for {$id}");
+        if (!isset($this->instances[$id])) {
+            $this->instances[$id] = $this->bindings[$id]($this);
         }
 
         return $this->instances[$id];

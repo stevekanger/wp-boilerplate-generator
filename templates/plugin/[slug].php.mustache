@@ -21,21 +21,18 @@ declare(strict_types=1);
 
 namespace {{phpNamespace}};
 
+use {{phpNamespace}}\Config\AppConfig;
+use {{phpNamespace}}\Controllers\AssetController;
+use {{phpNamespace}}\Controllers\BlockController;
 use {{phpNamespace}}\Core\Container;
-use {{phpNamespace}}\Core\Plugin;
-use {{phpNamespace}}\Core\Config;
 
 defined('ABSPATH') || exit;
 
 // Require autoloader
 require_once __DIR__ . '/vendor/autoload.php';
 
-/*
- * Initialize the config information.
- *
- * @since 0.1.0
- */
-Config::init(
+// Initialize the app config information.
+AppConfig::init(
     get_file_data(__FILE__, ['Version' => 'Version'])['Version'] ?: '0.1.0',
     __DIR__,
     __FILE__,
@@ -44,27 +41,15 @@ Config::init(
     '{{slug}}',
 );
 
-/**
- * Get the instance.
- *
- * If there is no running instance then initialize and assign it to the $instance.
- *
- * @since 0.1.0
- */
-function get_plugin(): Plugin {
-    static $instance = null;
+// Create container and bind controllers and services
+$container = new Container();
 
-    if (!$instance) {
-        // Setup dependencies
-        $container = new Container();
+$container->bind(AssetController::class, function(Container $container) {
+    return new AssetController($container);
+});
+$container->bind(BlockController::class, function(Container $container) {
+    return new BlockController($container);
+});
 
-        // Create the instance
-        $instance = new Plugin($container);
-        $instance->init();
-    }
-
-    return $instance;
-}
-
-// Start the plugin
-$plugin = get_plugin();
+// Initialize the App
+$app = (new App($container))->init();

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace {{phpNamespace}}\Core;
 
+use {{phpNamespace}}\Config\AppConfig;
+
 /**
  * Create a view from template part.
  *
@@ -28,7 +30,7 @@ final class View {
 
         extract($data);
         ob_start();
-        include Config::root_dir("/inc/views/{$view}.php");
+        include AppConfig::root_dir("/inc/views/{$view}.php");
         $this->rendered = ob_get_clean();
     }
 

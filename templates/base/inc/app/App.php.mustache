@@ -1,0 +1,93 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{phpNamespace}};
+
+{{#isPlugin}}
+use {{phpNamespace}}\Config\AppConfig;
+{{/isPlugin}}
+use {{phpNamespace}}\Core\Container;
+
+defined('ABSPATH') || exit;
+
+/**
+ * Main application class.
+ *
+ * @since 0.1.0
+ */
+final class App {
+    /**
+     * Setup the App attributes.
+     *
+     * @param Container $container The service container
+     *
+     * @since 0.1.0
+     */
+    public function __construct(
+        private Container $container,
+    ) {
+    }
+
+    /**
+     * Initializes the application.
+     *
+     * @since 0.1.0
+     */
+    public function init(): static {
+        $this->register();
+{{#isPlugin}}       
+
+        // Plugin activation hooks
+        $root_file = AppConfig::root_file();
+        register_activation_hook($root_file, [$this, 'activate']);
+        register_deactivation_hook($root_file, [$this, 'deactivate']);
+{{/isPlugin}}       
+
+        return $this;
+    }
+ 
+    /**
+     * Registers all bound controllers and services.
+     *
+     * @since 0.1.0
+     */
+    public function register(): void {
+        foreach ($this->container->get_ids() as $id) {
+            $instance = $this->container->get($id);
+
+            if (method_exists($instance, 'register')) {
+                $instance->register();
+            }
+        }
+    }
+
+    /**
+     * Gets the service container.
+     *
+     * @since 0.1.0
+     */
+    public function container(): Container {
+        return $this->container;
+    }
+{{#isPlugin}}
+
+    /**
+     * Plugin activation hook.
+     *
+     * @since 0.1.0
+     */
+    public function activate(): void {
+        flush_rewrite_rules();
+    }
+
+    /**
+     * Plugin deactivation hook.
+     *
+     * @since 0.1.0
+     */
+    public function deactivate(): void {
+        flush_rewrite_rules();
+    }
+{{/isPlugin}}
+}

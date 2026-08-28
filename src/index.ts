@@ -91,6 +91,7 @@ function getDestPath(
 ): string {
   const parsed = path.parse(path.join(destDir, fileName));
 
+  // parse out any filename placeholders
   if (parsed.base.includes("[slug]")) {
     parsed.base = parsed.base.replace("[slug]", vars.slug);
     parsed.name = parsed.name.replace("[slug]", vars.slug);
@@ -162,6 +163,7 @@ async function main() {
 
     const templateVars: TemplateVars = {
       type,
+      typeProper: type === "plugin" ? "Plugin" : "Theme",
       isPlugin: type === "plugin",
       isTheme: type === "theme",
       title,

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace {{phpNamespace}}\Core;
+namespace {{phpNamespace}}\Config;
 
 /**
  * Houses the configuration.
@@ -11,7 +11,7 @@ namespace {{phpNamespace}}\Core;
  *
  * @since 0.1.0
  */
-final class Config {
+final class AppConfig {
     private static ?self $instance = null;
 
     private function __construct(
@@ -25,7 +25,7 @@ final class Config {
     }
 
     /**
-     * Initialize Config exactly once.
+     * Initialize AppConfig exactly once.
      *
      * @param string $version the current version
      * @param string $root_dir the root directory
@@ -45,7 +45,7 @@ final class Config {
         string $slug,
     ): void {
         if (null !== self::$instance) {
-            throw new \LogicException('Config has already been initialized');
+            throw new \LogicException('AppConfig has already been initialized');
         }
 
         self::$instance = new self(
@@ -61,13 +61,13 @@ final class Config {
     /**
      * Gets the config instance.
      *
-     * @return Config the instance of the config
+     * @return AppConfig the instance of the config
      *
      * @since 0.1.0
      */
     private static function instance(): self {
         if (!self::$instance) {
-            throw new \RuntimeException('Config has not been initialized');
+            throw new \RuntimeException('AppConfig has not been initialized');
         }
 
         return self::$instance;
